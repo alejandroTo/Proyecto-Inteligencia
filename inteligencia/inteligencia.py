@@ -1,23 +1,12 @@
 import bs4
 from selenium import webdriver
-import os
 from selenium import webdriver
 import time, requests
 from urllib.request import urlopen
 import json
 import pyodbc
 import Dao.conexion as conn
-from google_images_download import google_images_download  
-
-#variables Globales
-#driver=webdriver.Chrome(executable_path=r'c:/Selenium/chromedriver.exe')
-
-
-def createFolder(name):
-    folder_name = name
-    if not os.path.isdir(folder_name):
-        os.makedirs(folder_name)
-    return folder_name
+import Helpers.CreateFolder as createFolder
 
 def download_image(url, folder_name, num):
     # write image to file
@@ -26,13 +15,8 @@ def download_image(url, folder_name, num):
         with open(os.path.join(folder_name, str(num)+".jpg"), 'wb') as file:
             file.write(reponse.content)
 
-
-
 def openBrowser(search_query,driver):
-    #search_URL = "https://www.google.com/search?q=car+parts&source=lnms&tbsearch_querym=isch"
-    #search_URL = f"http://sesat.fdi.ucm.es:8080/servicios/rest/sinonimos/json/{search_query}"
     search_URL = f"https://www.google.com/search?site=&tbm=isch&source=hp&biw=1873&bih=990&q={search_query}"
-    #images_url = []
     driver.get(search_URL)
 
 def getInformationImages(folder_name,driver):
@@ -73,8 +57,6 @@ def getInformationImages(folder_name,driver):
         except:
             print("Couldn't download an image %s, continuing downloading the next one"%(i))
 
-
-
 def insertData():
     c1 = conn.Conexion()
     try:
@@ -93,17 +75,33 @@ def get_Sinonimos(search_query):
     data_json = json.loads(response.read())
     return data_json
 
-  
-    
-    
+def menu():
+    try:
+        opc = int(input("1.Buscar Imagenes. \n2.Detectar Objetos. \n3.salir"))
+        return opc
+    except Exception as e:
+      print("Ingresa una opcion valida", e)
 
-#words = get_Sinonimos('andar')
-#items = search_google('perro')
 def main():
-    thing = input("¿Que deseas Buscar?")
-    driver=webdriver.Chrome(executable_path=r'c:/Selenium/chromedriver.exe')
-    insertData()
-    name_folder = createFolder(thing)
-    openBrowser(thing,driver)
-    getInformationImages(name_folder,driver)
+    opc = menu()
+    while(opc!=3):
+        if opc==1:
+            thing = input("¿Que deseas Buscar?")
+            driver=webdriver.Chrome(executable_path=r'c:/Selenium/chromedriver.exe')
+            insertData()
+            #objeto Create Folder
+            cFolder = createFolder.CreateFolder()
+            name_folder = cFolder.createFolder(thing)
+            #name_folder = createFolder(thing)
+            openBrowser(thing,driver)
+            getInformationImages(name_folder,driver)
+            opc = menu()
+        elif opc==2:
+            
+            opc = menu()
+        elif opc==3:
+            print("saliendo...")
+        else:
+             print("Ingresa una opcion valida")
+             opc = menu()
 main()

@@ -24,10 +24,14 @@
     <Compile Include="Dao\conexion.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Helpers\CreateFolder.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="inteligencia.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Dao\" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
