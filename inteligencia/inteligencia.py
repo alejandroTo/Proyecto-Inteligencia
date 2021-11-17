@@ -1,5 +1,6 @@
 import bs4
 from selenium import webdriver
+import os
 from selenium import webdriver
 import time, requests
 from urllib.request import urlopen
@@ -7,14 +8,13 @@ import json
 import pyodbc
 import Dao.conexion as conn
 import Helpers.CreateFolder as createFolder
-
+import Helpers.DownloadImages as download
 def download_image(url, folder_name, num):
     # write image to file
     reponse = requests.get(url)
     if reponse.status_code==200:
         with open(os.path.join(folder_name, str(num)+".jpg"), 'wb') as file:
             file.write(reponse.content)
-
 def openBrowser(search_query,driver):
     search_URL = f"https://www.google.com/search?site=&tbm=isch&source=hp&biw=1873&bih=990&q={search_query}"
     driver.get(search_URL)
@@ -52,10 +52,14 @@ def getInformationImages(folder_name,driver):
                     print("Timeout! Will download a lower resolution image and move onto the next one")
                     break
         try:
+            downimages =  download.DownloadImg()
+            #downimages.download_images(imageURL, folder_name, i)
             download_image(imageURL, folder_name, i)
             print("Downloaded element %s out of %s total. URL: %s" % (i, len_containers + 1, imageURL))
         except:
             print("Couldn't download an image %s, continuing downloading the next one"%(i))
+
+
 
 def insertData():
     c1 = conn.Conexion()
@@ -81,7 +85,9 @@ def menu():
         return opc
     except Exception as e:
       print("Ingresa una opcion valida", e)
-
+    
+#words = get_Sinonimos('andar')
+#items = search_google('perro')
 def main():
     opc = menu()
     while(opc!=3):
@@ -92,7 +98,7 @@ def main():
             #objeto Create Folder
             cFolder = createFolder.CreateFolder()
             name_folder = cFolder.createFolder(thing)
-            #name_folder = createFolder(thing)
+           
             openBrowser(thing,driver)
             getInformationImages(name_folder,driver)
             opc = menu()

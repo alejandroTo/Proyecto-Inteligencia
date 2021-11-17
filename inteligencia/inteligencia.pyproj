@@ -27,6 +27,9 @@
     <Compile Include="Helpers\CreateFolder.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Helpers\DownloadImages.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="inteligencia.py" />
   </ItemGroup>
   <ItemGroup>
