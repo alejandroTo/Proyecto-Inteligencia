@@ -9,6 +9,53 @@ import pyodbc
 import Dao.conexion as conn
 import Helpers.CreateFolder as createFolder
 import Helpers.DownloadImages as download
+import cv2
+import numpy as np
+import imutils
+from PIL import Image
+#variable gloabal
+Datos = 'n'
+x1, y1 = 190, 80
+x2, y2 = 450, 398
+
+def captura():
+    count = 0
+    while True:
+        ret,frame = cap.read()
+        if ret == False:  break
+        imAux = frame.copy()
+        cv2.rectangle(frame,(x1,y1),(x2,y2),(255,0,0),2)
+        objeto = imAux[y1:y2,x1:x2]
+        objeto = imutils.resize(objeto, width=38)
+        k = cv2.waitKey(1)
+        if k == ord('s'):
+            cv2.imwrite(Datos+'/objeto_{}.jpg'.format(count),objeto)
+            print('Imagen almacenada: ', 'objeto_{}.jpg'.format(count))
+            count = count + 1
+            if k == 27: 
+                break
+        cv2.imshow('frame',frame)
+        cv2.imshow('objeto',objeto)
+    cap.release()
+    cv2.destroyAllWindows()
+
+def detectar():
+    cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+    majinBooClassif = cv2.CascadeClassifier('cascade.xml')
+    while True:
+        ret,frame = cap.read()
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        toy = majinBooClassif.detectMultiScale(gray,scaleFactor = 5,
+	    minNeighbors = 91,minSize=(70,78))
+        for (x,y,w,h) in toy:
+            cv2.rectangle(frame, (x,y),(x+w,y+h),(0,255,0),2)
+            cv2.putText(frame,'Majin Boo',(x,y-10),2,0.7,(0,255,0),2,cv2.LINE_AA)    
+        cv2.imshow('frame',frame)
+        if cv2.waitKey(1) == 27:
+            break
+        cap.release()
+        cv2.destroyAllWindows()
+
 def download_image(url, folder_name, num):
     # write image to file
     reponse = requests.get(url)
@@ -103,7 +150,7 @@ def main():
             getInformationImages(name_folder,driver)
             opc = menu()
         elif opc==2:
-            
+            detectar()
             opc = menu()
         elif opc==3:
             print("saliendo...")
